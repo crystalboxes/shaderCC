@@ -70,12 +70,17 @@ void AddGlslangSource(const char* filename, const char* source) {
 }
 
 std::map<std::string, std::vector<unsigned int>>& GetCompiledSpv(){
-    // std::vector<std::pair<std::string, std::vector<unsigned int>>>& GetCompiledSpv() {
     return gSpvOut;
 }
 
+// Used to get reflection
+std::map<std::string, std::string> gTextureNameMapping;
+
+void buildTextureNameMapping(glslang::TProgram & program) {
+  throw 1;
+}
+
 void outputSpvBinToMemory(const std::vector<unsigned int>& spirv, const char* baseName) {
-    // gSpvOut.push_back({baseName, });
     gSpvOut[baseName] = spirv;
 }
 
@@ -1121,6 +1126,7 @@ void CompileAndLinkShaderUnits(std::vector<ShaderCompUnit> compUnits)
     if (Options & EOptionDumpReflection) {
         program.buildReflection(ReflectOptions);
         program.dumpReflection();
+        buildTextureNameMapping(program);
     }
 #endif
 
