@@ -5,7 +5,7 @@ endif()
 
 function(UpdateExternalLib name url rev)
     set(need_checkout FALSE)
-    set(external_folder "${MYROOTDIR}/ext")
+    set(external_folder "${MYROOTDIR}/external")
     set(external_lib_folder "${external_folder}/${name}")
     if(EXISTS ${external_lib_folder})
         message(STATUS "Updating ${name} to revision ${rev}...")
@@ -28,10 +28,8 @@ function(UpdateExternalLib name url rev)
     endif()
 endfunction()
 
-
 UpdateExternalLib("glslang" "https://github.com/KhronosGroup/glslang.git" "bd97b6f9f2132fa8df90431415e32dbab5c76db8")
 UpdateExternalLib("SPIRV-Cross" "https://github.com/KhronosGroup/SPIRV-Cross.git" "f912c32898dbf558635c9d5a2d50ff887c1402ae")
-# Configure glfw
 
 add_subdirectory(glslang)
 add_subdirectory(SPIRV-Cross)
