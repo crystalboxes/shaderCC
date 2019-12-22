@@ -72,12 +72,24 @@ void AddGlslangSource(const char* filename, const char* source) {
 std::map<std::string, std::vector<unsigned int>>& GetCompiledSpv(){
     return gSpvOut;
 }
-
+#include "reflectionData.h"
 // Used to get reflection
 std::map<std::string, std::string> gTextureNameMapping;
+std::map<shadercc::intermediate::UniformType, std::vector<shadercc::intermediate::ReflectionData>> gReflectionData;
 
 void buildTextureNameMapping(glslang::TProgram & program) {
-  throw 1;
+  for (int x = 0; x < program.getNumUniformVariables(); x++) {
+    auto &uniform = program.getUniform(x);
+    if (uniform.getType()->isTexture()) {
+      gReflectionData[shadercc::intermediate::UniformType::Texture].push_back(
+      {
+        uniform.name,
+        uniform.getBinding(),
+        uniform.size,
+        uniform.offset
+      });
+    }
+  }
 }
 
 void outputSpvBinToMemory(const std::vector<unsigned int>& spirv, const char* baseName) {

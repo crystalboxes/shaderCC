@@ -7,8 +7,14 @@
 #include <map>
 #include <sstream>
 #include <fstream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "./../glslang/Public/ShaderLang.h"
+
+#include "reflectionData.h"
+extern  std::map<shadercc::intermediate::UniformType, std::vector<shadercc::intermediate::ReflectionData>> gReflectionData;
 
 extern glslang::TProgram gProgram;
 
@@ -81,13 +87,14 @@ ResultDesc compile(const SourceDesc &source_desc, const TargetDesc &target_desc)
   AddGlslangSource(fakeSourceName, source.c_str());
 
   char *args[] = {
-      "glslangValidator",
-      "-q",
-      "--hlsl-offsets", "--hlsl-iomap", "--auto-map-bindings",
-      "-e", const_cast<char *>(source_desc.entry_point.c_str()),
-      "-o", outSourceName,
-      "-V",
-      "-D", fakeSourceName};
+    "glslangValidator",
+    "-q",
+    "--hlsl-offsets", "--hlsl-iomap", "--auto-map-bindings",
+    "-e", const_cast<char *>(source_desc.entry_point.c_str()),
+    "-o", outSourceName,
+    "-V",
+    "-D", fakeSourceName
+  };
 
   size_t argc = sizeof(args) / sizeof(args[0]);
   int result = glslangValidator(argc, args);
@@ -135,14 +142,24 @@ ResultDesc compile(const SourceDesc &source_desc, const TargetDesc &target_desc)
 
   // Compile to GLSL, ready to give to GL driver.
   std::string source2 = glsl.compile();
-
+  ResultDesc result_ = {false,  "", source2, {}};
+  
   {
     // make reflection data here
-    throw 1;
-
+    auto sh = glsl.get_shader_resources();
+    int index = 0;
+    for (auto &image : sh.sampled_images) {
+      std::string name = std::string("_") + std::to_string(image.id);
+      for (auto &t : gReflectionData[shadercc::intermediate::UniformType::Texture]) {
+        if (t.binding == index) {
+          result_.reflection_data.texture_name_mapping[name] = t.name;
+        }
+      }
+      index++;
+    }
+    
   }
 
-  return {false,  "", source2, {}};
+  return result_;
 }
-
 } // namespace shadercc
