@@ -9,6 +9,9 @@ option(ENABLE_OPT "Enables spirv-opt capability if present" ON)
 
 set(MYROOTDIR ${CMAKE_CURRENT_SOURCE_DIR})
 add_subdirectory(external)
-SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -std=c++0x -stdlib=libc++")
+
+if (NOT MSVC)
+  set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -std=c++0x -stdlib=libc++")
+endif()
 
 add_subdirectory(glslangValidator)
